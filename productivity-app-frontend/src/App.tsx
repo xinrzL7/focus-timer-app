@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import viteLogo from '/vite.svg'
 import SessionPage from './pages/SessionsPage'
 
 function App(){

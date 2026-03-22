@@ -4,7 +4,7 @@ import type { FocusSession } from "../types/FocusSession";
 import { focusTypeMap, focusTypes } from "../constants/FocusTypes";
 
 export default function SessionPage(){
-    const [sessions, setSessions] = useState<FocusSession[]>([])
+    const [_sessions, setSessions] = useState<FocusSession[]>([])
     const [historySessions, setHistorySessions] = useState<FocusSession[]>([])
     const [isRunning, setIsRunning] = useState(false)
     const [sessionId, setSessionId] = useState<number | null>(null)
