@@ -17,28 +17,27 @@ export default function SessionPage(){
     const [historyType, setHistoryType] = useState<string>("")
     const [justFinished, setJustFinished] = useState(false)
     const [finishType, setFinishType] = useState<"completed" | "stopped" | null>(null)
+    const [startTime, setStartTime] = useState<string | null>(null)
 
     useEffect(() => {
         loadSessions()
         checkRunning()
     }, [])
 
-    useEffect(() => {
-        if (!isRunning) return
+     useEffect(() => {
+        const handleVisibilityChange = async () => {
+            if (!document.hidden && isRunning) {
+                try {
+                    const session = await getRunningSession()
+                    if (!session) return
 
-        const timer = setInterval(() => {
-            setSecondsLeft((s) =>{
-                if (s <= 1){
-                    clearInterval(timer)
-                    setFinishType("completed")   // ✅ 倒數完成
-                    handleStop()
-                    return 0
-                }
-                return s - 1
-            })
-        }, 1000)
+                    setStartTime(session.startTime)
+                } catch {}
+            }
+        }
 
-        return () => clearInterval(timer)
+        document.addEventListener("visibilitychange", handleVisibilityChange)
+        return () => document.removeEventListener("visibilitychange", handleVisibilityChange)
     }, [isRunning])
 
     useEffect(() => {
@@ -47,18 +46,41 @@ export default function SessionPage(){
         }
     }, [duration])
 
-    const loadSessions = async () => {
-    try {
-        const data = await getSessions()
-        setSessions(data)
+    useEffect(() => {
+        if (!isRunning || !startTime) return
 
-        const today = await getTodayMinutes()
-        setTodayMinutes(today)
-    } catch (err: any) {
-        console.error(err)
-        alert(err.response?.data || "Failed to load sessions")
+        const timer = setInterval(() => {
+            const start = new Date(startTime).getTime()
+            const now = Date.now()
+
+            const total = duration * 60
+            const elapsed = Math.floor((now - start) / 1000)
+
+            const left = Math.max(total - elapsed, 0)
+
+            setSecondsLeft(left)
+
+            if (left <= 0) {
+                setFinishType("completed")
+                handleStop()
+            }
+        }, 1000)
+
+        return () => clearInterval(timer)
+    }, [isRunning, startTime, duration])
+    
+    const loadSessions = async () => {
+        try {
+            const data = await getSessions()
+            setSessions(data)
+
+            const today = await getTodayMinutes()
+            setTodayMinutes(today)
+        } catch (err: any) {
+            console.error(err)
+            alert(err.response?.data || "Failed to load sessions")
+        }
     }
-}
 
     const loadHistory = async () => {
         try {
@@ -78,6 +100,7 @@ export default function SessionPage(){
             setSessionId(session.id)
             setIsRunning(true)
             setDuration(session.plannedMinutes)
+            setStartTime(session.startTime)
 
             const start = new Date(session.startTime).getTime()
             const now = Date.now()
@@ -94,6 +117,8 @@ export default function SessionPage(){
             setFinishType(null)
             setSessionId(session.id)
             setIsRunning(true)
+
+            setStartTime(session.startTime)
             setSecondsLeft(duration * 60)
         } catch {
             alert("A focus session is already running.")
@@ -101,7 +126,7 @@ export default function SessionPage(){
     }
 
     const handleStopClick = () => {
-        setFinishType("stopped")  // ✅ 手動停止
+        setFinishType("stopped") 
         handleStop()
     }
 
@@ -187,8 +212,8 @@ export default function SessionPage(){
                 }}>
                     {
                         finishType === "completed"
-                        ? "🎉 完成一次專注！你正在變強。"
-                        : "⏸️ 這次先暫停，沒關係，下次會更穩。"
+                        ? "🎉 完成一次專注！"
+                        : "⏸️"
                     }
                 </div>
             )}
