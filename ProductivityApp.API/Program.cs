@@ -4,6 +4,12 @@ using ProductivityApp.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated();
+}
+
 // ¥[¤J DbContext
 //builder.Services.AddDbContext<AppDbContext>(options =>
 //    options.UseInMemoryDatabase("ProductivityDb"));
@@ -39,8 +45,8 @@ app.Urls.Add($"http://*:{port}");
 
 app.UseAuthorization();
 
-app.MapControllers();
 app.MapGet("/", () => "API is running");
+app.MapControllers();
 
 app.Run();
 
