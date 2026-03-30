@@ -4,8 +4,10 @@ using ProductivityApp.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var dbPath = DbPathHelper.GetDbPath();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=productivity.db"));
+    options.UseSqlite($"Data Source={dbPath}"));
 
 // ³B²z¸ó¤é
 builder.Services.AddScoped<FocusAnalyticsService>();
@@ -21,7 +23,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
+    db.Database.EnsureCreated();
 }
 
 app.UseSwagger();
