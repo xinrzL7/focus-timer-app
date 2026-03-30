@@ -40,5 +40,7 @@ app.Urls.Add($"http://*:{port}");
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGet("/", () => "API is running");
 
 app.Run();
+
