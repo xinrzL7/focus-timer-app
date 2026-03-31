@@ -9,6 +9,16 @@ var dbPath = DbPathHelper.GetDbPath();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("https://focus-timer-drab-psi.vercel.app") // 前端 Vercel 網址
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // 處理跨日
 builder.Services.AddScoped<FocusAnalyticsService>();
 // 處理CRUD
@@ -33,6 +43,7 @@ var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Urls.Add($"http://*:{port}");
 
 //app.UseHttpsRedirection();
+app.UseCors("AllowFrontend");
 app.UseAuthorization();
 
 app.MapGet("/", () => "API is running");
