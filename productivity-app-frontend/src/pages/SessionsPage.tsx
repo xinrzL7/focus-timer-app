@@ -3,7 +3,7 @@ import { getSessions, startSession, stopSession, getRunningSession, getHistory, 
 import type { FocusSession } from "../types/FocusSession";
 import { focusTypeMap, focusTypes } from "../constants/FocusTypes";
 
-export default function SessionPage(){
+export default function SessionPage() {
     const [_sessions, setSessions] = useState<FocusSession[]>([])
     const [historySessions, setHistorySessions] = useState<FocusSession[]>([])
     const [isRunning, setIsRunning] = useState(false)
@@ -24,7 +24,7 @@ export default function SessionPage(){
         checkRunning()
     }, [])
 
-     useEffect(() => {
+    useEffect(() => {
         const handleVisibilityChange = async () => {
             if (!document.hidden && isRunning) {
                 try {
@@ -32,7 +32,7 @@ export default function SessionPage(){
                     if (!session) return
 
                     setStartTime(session.startTime)
-                } catch {}
+                } catch { }
             }
         }
 
@@ -68,7 +68,7 @@ export default function SessionPage(){
 
         return () => clearInterval(timer)
     }, [isRunning, startTime, duration])
-    
+
     const loadSessions = async () => {
         try {
             const data = await getSessions()
@@ -86,14 +86,14 @@ export default function SessionPage(){
         try {
             const data = await getHistory(historyStart, historyEnd, historyType)
             setHistorySessions(data)
-        } catch(err: any) {
+        } catch (err: any) {
             console.log(err.response?.data)
             alert(err.response?.data || "Something went wrong")
         }
     }
 
     const checkRunning = async () => {
-        try{
+        try {
             const session = await getRunningSession()
             if (!session) return
 
@@ -107,11 +107,11 @@ export default function SessionPage(){
             const elapsed = Math.floor((now - start) / 1000)
             const total = session.plannedMinutes * 60
             setSecondsLeft(Math.max(total - elapsed, 0))
-            setTypeId(session.typeId);            
-        } catch {/* no running session */}
+            setTypeId(session.typeId);
+        } catch {/* no running session */ }
     }
 
-    const handleStart = async() => {
+    const handleStart = async () => {
         try {
             const session = await startSession(duration, typeId)
             setFinishType(null)
@@ -126,7 +126,7 @@ export default function SessionPage(){
     }
 
     const handleStopClick = () => {
-        setFinishType("stopped") 
+        setFinishType("stopped")
         handleStop()
     }
 
@@ -153,7 +153,7 @@ export default function SessionPage(){
         animation: isRunning ? "pulse 1.5s infinite" : "none"
     }
 
-    const progress =  duration ? secondsLeft / (duration * 60) : 0
+    const progress = duration ? secondsLeft / (duration * 60) : 0
 
     const Pet = ({ isRunning, justFinished }: { isRunning: boolean, justFinished: boolean }) => {
         return (
@@ -161,16 +161,16 @@ export default function SessionPage(){
                 marginTop: "20px",
                 display: "flex",
                 justifyContent: "center"
-                }}>
+            }}>
                 <div style={{
                     fontSize: "48px",
                     animation: justFinished
-                    ? "petJump 0.6s ease"
-                    : isRunning 
-                        ? "petBreathFast 1.2s ease-in-out infinite"
-                        : "petBreathSlow 2.5s ease-in-out infinite"
+                        ? "petJump 0.6s ease"
+                        : isRunning
+                            ? "petBreathFast 1.2s ease-in-out infinite"
+                            : "petBreathSlow 2.5s ease-in-out infinite"
                 }}>
-                🐈‍⬛    
+                    🐈‍⬛
                 </div>
             </div>
         )
@@ -214,7 +214,7 @@ export default function SessionPage(){
                         }
                         `}
                     </style>
-                    <h1 style={{ 
+                    <h1 style={{
                         textAlign: "center",
                         fontSize: "clamp(20px, 6vw, 32px)",
                         marginBottom: "6px"
@@ -246,7 +246,7 @@ export default function SessionPage(){
                                 strokeDashoffset={(1 - progress) * 2 * Math.PI * 100}
                                 strokeLinecap="round"
                                 style={{
-                                transition: "stroke-dashoffset 1s linear"
+                                    transition: "stroke-dashoffset 1s linear"
                                 }}
                             />
                         </svg>
@@ -267,14 +267,14 @@ export default function SessionPage(){
                                     onClick={() => setDuration(min)}
                                     disabled={isRunning}
                                     style={{
-                                    ...clockButton,
-                                    transform: `translate(${x}px, ${y}px)`,
-                                    background: duration === min ? "#4CAF50" : "#f1f5f9",
-                                    color: duration === min ? "#fff" : "#334155",
-                                    boxShadow: duration === min
-                                    ? "0 4px 12px rgba(76,175,80,0.4)"
-                                    : "0 2px 6px rgba(0,0,0,0.08)",                           
-                                    border: duration === min ? "2px solid #4CAF50" : "1px solid #ccc",
+                                        ...clockButton,
+                                        transform: `translate(${x}px, ${y}px)`,
+                                        background: duration === min ? "#4CAF50" : "#f1f5f9",
+                                        color: duration === min ? "#fff" : "#334155",
+                                        boxShadow: duration === min
+                                            ? "0 4px 12px rgba(76,175,80,0.4)"
+                                            : "0 2px 6px rgba(0,0,0,0.08)",
+                                        border: duration === min ? "2px solid #4CAF50" : "1px solid #ccc",
                                     }}
                                     onMouseDown={(e) => e.currentTarget.style.transform += " scale(0.9)"}
                                     onMouseUp={(e) => e.currentTarget.style.transform = `translate(${x}px, ${y}px) scale(1.1)`}
@@ -293,28 +293,28 @@ export default function SessionPage(){
                             類型：
                             <div
                                 style={{
-                                background: "#f1f5f9",
-                                padding: "6px 10px",
-                                borderRadius: "10px"
-                            }}>
+                                    background: "#f1f5f9",
+                                    padding: "6px 10px",
+                                    borderRadius: "10px"
+                                }}>
                                 <select
                                     value={typeId}
                                     onChange={e => setTypeId(e.target.value)}
                                     disabled={isRunning}
                                     style={selectStyle}
-                                    >
+                                >
                                     {focusTypes.map(t => (
                                         <option key={t.id} value={t.id}>{t.name}</option>
                                     ))}
                                 </select>
                             </div>
                         </label>
-                        
+
                         {!isRunning ? (
-                            <button 
-                                onClick={handleStart} 
+                            <button
+                                onClick={handleStart}
                                 style={{
-                                    ...btnStyle, 
+                                    ...btnStyle,
                                     //background: "linear-gradient(135deg, #ef4444, #dc2626)",
                                     //boxShadow: "0 6px 16px rgba(239,68,68,0.3)"
                                 }}
@@ -325,8 +325,8 @@ export default function SessionPage(){
                             >
                                 Start
                             </button>) : (
-                            <button 
-                                onClick={handleStopClick} 
+                            <button
+                                onClick={handleStopClick}
                                 style={{ ...btnStyle, background: "#FF8A80" }}
                                 onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
                                 onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
@@ -364,24 +364,24 @@ export default function SessionPage(){
                         <h3 style={{ color: "#666" }}>History</h3>
                         <div style={{ marginBottom: "10px", display: "flex", flexWrap: "wrap", gap: "10px" }}>
                             <label>
-                            開始日期：
-                            <input type="date" value={historyStart} onChange={e => setHistoryStart(e.target.value)} style={inputStyle} />
+                                開始日期：
+                                <input type="date" value={historyStart} onChange={e => setHistoryStart(e.target.value)} style={inputStyle} />
                             </label>
                             <label>
-                            結束日期：
-                            <input type="date" value={historyEnd} onChange={e => setHistoryEnd(e.target.value)} style={inputStyle} />
+                                結束日期：
+                                <input type="date" value={historyEnd} onChange={e => setHistoryEnd(e.target.value)} style={inputStyle} />
                             </label>
                             <label>
-                            類型：
-                            <select value={historyType} onChange={e => setHistoryType(e.target.value)} style={selectStyle}>
-                                <option value="">全部</option>
-                                {focusTypes.map(t => (
-                                <option key={t.id} value={t.id}>{t.name}</option>
-                                ))}
-                            </select>
+                                類型：
+                                <select value={historyType} onChange={e => setHistoryType(e.target.value)} style={selectStyle}>
+                                    <option value="">全部</option>
+                                    {focusTypes.map(t => (
+                                        <option key={t.id} value={t.id}>{t.name}</option>
+                                    ))}
+                                </select>
                             </label>
-                            <button 
-                                onClick={loadHistory} 
+                            <button
+                                onClick={loadHistory}
                                 style={{ ...btnStyle, padding: "6px 12px" }}
                                 onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
                                 onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
@@ -396,17 +396,17 @@ export default function SessionPage(){
                             <div style={{ color: "#888" }}>查無資料</div>
                         ) : (
                             historySessions.map((s) => (
-                            <div key={s.id} style={{ padding: "10px", borderRadius: "10px", background: "#fafafa", marginBottom: "8px" }}>
-                                {new Date(s.startTime + "Z").toLocaleString()} - {new Date(s.endTime + "Z").toLocaleString()}<br />
-                                <strong>{s.durationMinutes} min</strong> · {focusTypeMap[s.typeId]}
-                            </div>
+                                <div key={s.id} style={{ padding: "10px", borderRadius: "10px", background: "#fafafa", marginBottom: "8px" }}>
+                                    {new Date(s.startTime + "Z").toLocaleString()} - {new Date(s.endTime + "Z").toLocaleString()}<br />
+                                    <strong>{s.durationMinutes} min</strong> · {focusTypeMap[s.typeId]}
+                                </div>
                             ))
                         )}
                     </div>
                 </div>
             </div>
         </div>
-        
+
     )
 }
 
@@ -499,11 +499,3 @@ const responsiveButtonContainer = {
     marginBottom: "30px",
     padding: "0 10px"
 }
-const theme = {
-  primary: "#7FB77E",   // 柔和綠（主色）
-  light: "#DFF5E1",     // 淡背景
-  accent: "#FFD9C0",    // 暖橘（點綴）
-  text: "#2F3E2F",
-  card: "#FFFFFF"
-}
-
